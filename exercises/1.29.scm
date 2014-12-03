@@ -1,6 +1,16 @@
 (use extras)
 (use test)
 
+; general sum
+(define (sum term a next b)
+  (if (> a b)
+      0
+      (+ (term a)
+         (sum term (next a) next b))))
+
+; inc
+(define (inc x) (+ x 1))
+
 ; Simpson's rule
 
 ; simpson
@@ -20,16 +30,9 @@
           ((= (modulo k 2) 1) (* 4 (simpson-y k)))
           ((= (modulo k 2) 0) (* 2 (simpson-y k)))))
 
-  ; sum
-  (define (simpson-sum k n)
-    (if (> k n)
-        0
-        (+ (simpson-term k)
-           (simpson-sum (+ k 1) n))))
-
   ; (h / 3)(y0 + 4y_1 + 2y_2 + 4y_3 + 2y_4 + ... + 2y_(n-2) + 4y_(n-1) + y_n)
   (* (/ simpson-h 3)
-     (simpson-sum 0 n)))
+     (sum simpson-term 0 inc n)))
 
 ; test
 ; unity
