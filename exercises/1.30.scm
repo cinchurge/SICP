@@ -7,7 +7,7 @@
   (define (iter a result)
     (if (> a b)
         result
-        (iter (next a) (+ a result))))
+        (iter (next a) (+ (term a) result))))
   (iter a 0))
 
 (test "(sum identity 0 inc 1) = 1" 1 (sum identity 0 inc 1))
