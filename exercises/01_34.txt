@@ -1,0 +1,1 @@
+in the case of (f f), we would be evaluating (f 2), which will then treat 2 as a callable when evaluating (f 2), resulting in (2 2). Since 2 is not a callable, this will result in an interpreter error.
