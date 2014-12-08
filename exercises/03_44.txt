@@ -1,0 +1,27 @@
+The main difference between exchange and transfer is that transfer only requires a withdraw operation and a deposit operation, while in an exchange, the balances of the two accounts must be queried first. The result is that transfer operations will work just fine as long as deposit and withdraw operations are serialized, while exchange operations will require serialization of each individual account.
+
+Exchange operations NEED information on the other account, while transfer operations DON'T need information on the other account.
+
+Exchange:
+$10     $20     $30
+A       B       C
+b$10
+        b$20
+        w$10
+d$10
+b$20
+                b$30
+                w$10
+d$10
+A       B       C
+$30     $10     $20
+
+Transfer:
+$10     $20     $30
+A       B       C
+        w$10
+d$10
+                w$10
+d$10
+A       B       C
+$30     $10     $20
