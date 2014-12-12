@@ -19,11 +19,22 @@
 
 (define (make-sem n)
     (let ((mutex (make-mutex)) (count 0))
-        (define (the-sem m)
+        (define (sem-acquire)
             (mutex 'acquire)
-            (cond ((eq? m 'acquire) (set! count (+ count 1)))
-                  ((eq? m 'release) (set! count (- count 1))))
-            (mutex 'release)
+            (if (>= count n)
+                (begin (mutex 'release)
+                       (sem-acquire))
+                (begin (set! count (+ count 1))
+                       (mutex 'release))))
+
+        (define (sem-release)
+            (mutex 'acquire)
+            (set! count (- count 1))
+            (mutex 'release))
+
+        (define (the-sem m)
+            (cond ((eq? m 'acquire) (sem-acquire))
+                  ((eq? m 'release) (sem-release)))
             (printf "count=~S~N" count))
         the-sem))
 
@@ -32,7 +43,6 @@
 
 
 (let ((sem (make-sem 3)))
-    (sem 'acquire)
     (sem 'acquire)
     (sem 'acquire)
     (sem 'acquire))
