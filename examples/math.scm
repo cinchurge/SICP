@@ -1,3 +1,6 @@
+; Basic math
+(define (square x) (* x x))
+
 ; Procedure for finding prime numbers
 (define (smallest-divisor n) (find-divisor n 2))
 
