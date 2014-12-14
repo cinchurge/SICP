@@ -39,7 +39,10 @@
 
 ; Displaying streams
 (define (display-stream s)
-  (stream-for-each display-line s))
+  (begin
+      (printf " ")
+      (stream-for-each display-line s))
+  (printf "~N"))
 (define (display-line x) (newline) (display x))
 
 ; stream-enumerate-interval
