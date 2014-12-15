@@ -1,29 +1,34 @@
+; Delay
+
 ; Stream construction
-; cons-stream is a special form in mit-scheme, but not in chicken
-; scheme, so it must be implemented separately.
+; cons-stream is a special form in mit-scheme, but is not a part of chicken
+; scheme, so it must be implemented explicitly
 (define-syntax cons-stream
   (syntax-rules ()
     ((cons-stream a b)
      (cons a (delay b)))))
 
-; the-empty-stream
+; the-empty-stream is just the same as the empty list
 (define the-empty-stream '())
 
-; stream-null?
+; stream-null? is just the same as null?
 (define (stream-null? stream)
   (null? stream))
 
 ; stream-car and stream-cdr
-(define (stream-car stream) (car stream))
-(define (stream-cdr stream) (force (cdr stream)))
+(define (stream-car stream)
+    (car stream))
 
-; Referencing stream elements
+(define (stream-cdr stream)
+    (force (cdr stream)))
+
+; stream-ref is the stream analog of list-ref
 (define (stream-ref s n)
   (if (= n 0)
       (stream-car s)
       (stream-ref (stream-cdr s) (- n 1))))
 
-; Mapping over stream elements
+; stream-map is the stream analog of map
 (define (stream-map proc s)
   (if (stream-null? s)
       the-empty-stream
@@ -41,9 +46,10 @@
 (define (display-stream s)
   (begin
       (printf " ")
-      (stream-for-each display-line s))
-  (printf "~N"))
-(define (display-line x) (newline) (display x))
+      (stream-for-each display-elm s)
+      (printf "~N")))
+
+(define (display-elm x) (printf " ~S" x))
 
 ; stream-enumerate-interval
 (define (stream-enumerate-interval low high)
