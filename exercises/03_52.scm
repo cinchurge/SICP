@@ -1,6 +1,27 @@
 (use extras)
 (use test)
 
+(define (memo-proc proc)
+  (let ((already-run? false) (result false))
+    (lambda ()
+      (if (not already-run?)
+          (begin (set! result (proc))
+                 (set! already-run? true)
+                 result)
+           result))))
+
+; Non-optimized delay
+(define-syntax delay 
+  (syntax-rules ()
+    ((delay expr)
+     (lambda ()
+        expr))))
+
+; force must be implemented since the default force
+; expects a promise object and not a straight lambda
+(define (force e)
+  (e))
+
 (load "../examples/streams.scm")
 
 (define sum 0)

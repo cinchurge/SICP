@@ -13,3 +13,6 @@
 
 (define (prime? n)
   (= n (smallest-divisor n)))
+
+(define (divisible? x y)
+  (zero? (remainder x y)))

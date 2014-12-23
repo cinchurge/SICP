@@ -1,5 +1,3 @@
-; Delay
-
 ; Stream construction
 ; cons-stream is a special form in mit-scheme, but is not a part of chicken
 ; scheme, so it must be implemented explicitly
@@ -69,3 +67,36 @@
                        (stream-cdr stream))))
         (else (stream-filter pred (stream-cdr stream)))))
 
+; stream-map
+(define (stream-map proc . argstreams)
+    (if (stream-null? (car argstreams))
+        the-empty-stream
+        (cons-stream
+         (apply proc (map stream-car argstreams))
+         (apply stream-map
+                (cons proc (map stream-cdr argstreams))))))
+
+; add-streams
+(define (add-streams s1 s2)
+  (stream-map + s1 s2))
+
+; scale-stream
+(define (scale-stream stream factor)
+  (stream-map (lambda (x) (* x factor))
+              stream))
+
+; display-stream-upto
+(define (display-stream-upto s n)
+  (define (loop c n)
+    (if (> c n)
+      (display "")
+      (begin
+        (printf "~S~N" (stream-ref s c))
+        (loop (+ c 1) n))))
+  (loop 1 n))
+
+
+; Infinite stream of integers
+(define (integers-starting-from n)
+  (cons-stream n (integers-starting-from (+ n 1))))
+(define integers (integers-starting-from 1))
