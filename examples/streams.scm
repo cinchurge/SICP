@@ -100,3 +100,9 @@
 (define (integers-starting-from n)
   (cons-stream n (integers-starting-from (+ n 1))))
 (define integers (integers-starting-from 1))
+
+; partial-sum: p_(n+1) = s_(n+1) + p_n
+
+(define (partial-sums s)
+  (cons-stream (stream-car s) (add-streams (partial-sums s) (stream-cdr s))))
+

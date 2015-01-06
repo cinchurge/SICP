@@ -1,0 +1,1 @@
+; The main difference is in the second argument in stream-map: if Louis's version, sqrt-stream is recursively called, whereas in the original version, the local variable guesses is passed in to stream-map, so there are no recursive calls right when sqrt-stream is evaluated.

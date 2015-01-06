@@ -1,6 +1,14 @@
 ; Basic math
 (define (square x) (* x x))
 
+(define (sum lst)
+  (if (null? lst)
+      0
+      (+ (car lst) (sum (cdr lst)))))
+
+(define (average . args)
+  (/ (sum args) (length args)))
+
 ; Procedure for finding prime numbers
 (define (smallest-divisor n) (find-divisor n 2))
 
