@@ -24,3 +24,5 @@
                        (merge (scale-stream S 2)
                               (merge (scale-stream S 3)
                                      (scale-stream S 5)))))
+
+(display-stream-upto S 20)

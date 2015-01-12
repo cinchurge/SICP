@@ -91,9 +91,9 @@
     (if (> c n)
       (display "")
       (begin
-        (printf "~S~N" (stream-ref s c))
+        (printf "~S => ~S~N" (+ c 1) (stream-ref s c))
         (loop (+ c 1) n))))
-  (loop 1 n))
+  (loop 0 n))
 
 
 ; Infinite stream of integers
