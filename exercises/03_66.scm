@@ -3,7 +3,35 @@
 ;
 ; I found the best way to tackle this problem is to write out
 ; the term count in a matrix similar to the figure on page 460.
-;
+
+(load "../examples/streams.scm")
+
+(define (pairs s t)
+  ;(printf "pairs ~S ~S~N" s t)
+  (cons-stream
+    ; We first take the head of both s and t and pair them together
+    ; to create the head of the stream
+    (list (stream-car s) (stream-car t))
+    ; We then pair the head of s with the rest of t, and interleave
+    ; that with the sequence of pairs generated with the rest of s
+    ; and the rest of t
+    (interleave
+      (stream-map (lambda (x) (list (stream-car s) x))
+                  (stream-cdr t))
+      (pairs (stream-cdr s) (stream-cdr t)))))
+
+(define (interleave s1 s2)
+  ;(printf "interleave ~S ~S~N" s1 s2)
+  (if (stream-null? s1)
+      s2
+      (cons-stream (stream-car s1)
+                   ; We must alternate between s1 and s2
+                   ; in order to correctly interleave the
+                   ; two streams
+                   (interleave s2 (stream-cdr s1)))))
+
+(display-stream-upto (pairs integers integers) 30)
+
 ; Printing out the first 30 terms, this is what it looks like:
 ;   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16
 ; 1 1   2   4   6   8  10  12  14  16   18  20  22  24  26  28  30

@@ -54,7 +54,7 @@
 (newline)
 
 (define (pairs s t)
-  (printf "pairs ~S ~S~N" s t)
+  ;(printf "pairs ~S ~S~N" s t)
   (cons-stream
     ; We first take the head of both s and t and pair them together
     ; to create the head of the stream

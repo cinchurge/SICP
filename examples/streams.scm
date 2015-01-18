@@ -88,7 +88,7 @@
 ; display-stream-upto
 (define (display-stream-upto s n)
   (define (loop c n)
-    (if (> c n)
+    (if (>= c n)
       (display "")
       (begin
         (printf "~S => ~S~N" (+ c 1) (stream-ref s c))
