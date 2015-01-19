@@ -66,11 +66,14 @@
               (stream-cdr sense-data)
               sense-data))
 
-; 1 period should give us one negative zero-crossing
-;(display-stream-upto zero-crossings 100)
-
 ; 2 periods should give us two negative zero-crossings and one positive zero-crossing
+;(printf "sense-data:~N")
+;(display-stream-upto sense-data 200)
+;(newline)
+
+;(printf "zero-crossings of sense-data:~N")
 ;(display-stream-upto zero-crossings 200)
+;(newline)
 
 ; Exercise 3.75
 
@@ -87,10 +90,13 @@
               (stream-cdr noisy-sense-data)
               noisy-sense-data))
 
-;(display-stream-upto noisy-sense-data 100)
+;(printf "noisy-sense-data:~N")
+;(display-stream-upto noisy-sense-data 200)
+;(newline)
 
-; 1 period should give us one negative zero-crossing
-;(display-stream-upto zero-crossings 100)
+;(printf "noisy-sense-data zero-crossings:~N")
+;(display-stream-upto zero-crossings 200)
+;(newline)
 
 ; Louis's modified code:
 (define (make-zero-crossings input-stream last-value)
@@ -106,8 +112,9 @@
   (make-zero-crossings (stream-cdr noisy-sense-data)
                        (stream-car noisy-sense-data)))
 
-; 1 period should give us one negative zero-crossing
-;(display-stream-upto zero-crossings 100)
+;(printf "Louis's zero-crossings:~N")
+;(display-stream-upto zero-crossings 200)
+;(newline)
 
 ; Louis made a mistake in making avpt an cumulative average
 ; of all data in the stream. For the smoothing to work, we
@@ -125,8 +132,9 @@
                        (stream-car (stream-cdr noisy-sense-data))
                        (stream-car noisy-sense-data)))
 
-; 1 period should give us one negative zero-crossing
-;(display-stream-upto zero-crossings 100)
+;(printf "windowed-smoothing:~N")
+;(display-stream-upto zero-crossings 200)
+;(newline)
 
 ; Exercise 3.76
 (define (smooth input-stream)
@@ -135,6 +143,14 @@
     (cons-stream (/ (+ pt1 pt2) 2)
                  (smooth (stream-cdr input-stream)))))
 
-(define zero-crossings (make-zero-crossings (stream-cdr (smooth noisy-sense-data)) (stream-car (smooth noisy-sense-data))))
+(define smoothed-noisy-sense-data (smooth noisy-sense-data))
 
-(display-stream-upto zero-crossings 100)
+(printf "smoothed noisy data:~N")
+(display-stream-upto smoothed-noisy-sense-data 200)
+(newline)
+
+(define zero-crossings (make-zero-crossings (stream-cdr smoothed-noisy-sense-data) (stream-car smoothed-noisy-sense-data)))
+
+(printf "modularized zero-crossings:~N")
+(display-stream-upto zero-crossings 200)
+(newline)
