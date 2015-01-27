@@ -2,6 +2,13 @@
 (use extras)
 (load "../examples/streams.scm")
 
+; Python extensions for plotting
+(require-extension pyffi)
+(py-start)
+(py-import "pylab")
+(define-pyfun "pylab.plot" data)
+(define-pyfun "pylab.show")
+
 ; gen-sine-wave: generate a stream representing a sine wave with
 ; frequency f, time interval dt
 (define (gen-sine-wave f dt n)
@@ -20,9 +27,13 @@
                               int)))
   int)
 
-; The integral of a sine wave over integrals of its
+; The integral of a sine wave over its
 ; period should be 0
 (define sine-integral (integral (stream-cdr sine-wave-100Hz) (stream-car sine-wave-100Hz) 0.0001))
+
+;(pylab.plot (stream->list-upto sine-wave-100Hz 200))
+(pylab.plot (stream->list-upto sine-integral 200))
+(pylab.show)
 
 ;(display-stream-upto sine-wave-100Hz 200)
 ;(display-stream-upto sine-integral 200)
@@ -32,10 +43,19 @@
 (define (RC r c dt)
   (define (rc i-stream v0)
     (add-streams (scale-stream i-stream r)
-                 (integral i-stream v0 dt)))
+                 (integral (scale-stream i-stream (/ 1.0 c)) v0 dt)))
   rc)
 
 (define RC1 (RC 5 1 0.5))
+
+; Starting from 0 volts, a DC current of 1A should charge up the capacitor
+; to V = R * I volts
+(define sine-wave-1000Hz (gen-sine-wave 1000.0 0.00001 0))
+(define dc-1amp (cons-stream 1 dc-1amp))
+;(pylab.plot (stream->list-upto (RC1 sine-wave-1000Hz 0) 200))
+(pylab.plot (stream->list-upto (RC1 dc-1amp 5) 1000))
+(pylab.show)
+
 
 ; Exercise 3.74
 ; Alyssa's code:
@@ -154,3 +174,12 @@
 (printf "modularized zero-crossings:~N")
 (display-stream-upto zero-crossings 200)
 (newline)
+
+(pylab.plot (stream->list-upto sine-wave-100Hz 200))
+(pylab.plot (stream->list-upto noisy-sense-data 200))
+(pylab.plot (stream->list-upto zero-crossings 200))
+(pylab.show)
+
+; Remember to clean up shop
+(py-stop)
+

@@ -1,0 +1,8 @@
+(require-extension pyffi)
+(py-start)
+(py-import "pylab")
+(define-pyfun "pylab.plot" data)
+(define-pyfun "pylab.show")
+(define l (list 1 2 1 2))
+(pylab.plot l)
+(pylab.show)

@@ -95,6 +95,11 @@
         (loop (+ c 1) n))))
   (loop 0 n))
 
+; stream->list-upto
+(define (stream->list-upto s n)
+  (if (= n 0)
+      (cons (stream-car s) '())
+      (cons (stream-car s) (stream->list-upto (stream-cdr s) (- n 1)))))
 
 ; Infinite stream of integers
 (define (integers-starting-from n)
