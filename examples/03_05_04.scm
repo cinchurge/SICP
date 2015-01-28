@@ -76,6 +76,8 @@
   (cons-stream (* a (sin (* 2.0 3.14159 f (* n dt))))
                (gen-sine-wave a f dt (+ n 1))))
 
+; This is of course non-optimized. For periodic signals this wastes a lot
+; of time since we're just repeatedly finding the same max.
 (define (list-max s s0)
   (if (null? s)
       s0
