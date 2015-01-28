@@ -4,10 +4,15 @@
 (require-extension pyffi)
 (py-start)
 (py-import "pylab")
-(define-pyfun "pylab.plot" y)
+(define-pyfun "pylab.plot" x y)
 (define-pyfun "pylab.semilogx" x y)
 (define-pyfun "pylab.xscale" t)
 (define-pyfun "pylab.show")
+(define-pyfun "pylab.savefig" figname)
+(define-pyfun "pylab.xlabel" title)
+(define-pyfun "pylab.ylabel" title)
+(define-pyfun "str" some_string)
+(define-pyfun "pylab.clf")
 
 ; The integral procedure from the previous section
 (define (integral integrand initial-value dt)
@@ -50,8 +55,13 @@
   (define i (stream-map (lambda (x) (/ (- V x) R)) v))
   v)
 
-(pylab.plot (stream->list-upto (RC-circuit 5.0 0.001 10.0 0.05) 1000))
-(pylab.show)
+(define tstream (scale-stream integers 0.05))
+(pylab.xlabel "Time (s)")
+(pylab.ylabel "Voltage (V)")
+(pylab.plot (stream->list-upto tstream 1000)
+            (stream->list-upto (RC-circuit 5.0 0.001 10.0 0.05) 1000))
+(pylab.savefig (str "charge.png"))
+(pylab.clf)
 
 ; The RC circuit modeled with a constant voltage source
 ; must be implemented with feedback loops
@@ -90,15 +100,9 @@
 (define amps (map (lambda (f) (list-max (stream->list-upto (RC-circuit R C (gen-sine-wave V f dt 0) dt) N) 0)) freqs))
 (pylab.semilogx freqs amps)
 
-;(pylab.plot (stream->list-upto (RC-circuit 100000.0 0.001 (gen-sine-wave 10.0 1.0 0.0001 0) 0.0001) 1000))
-;(pylab.plot (stream->list-upto (RC-circuit 100000.0 0.001 (gen-sine-wave 10.0 5.0 0.0001 0) 0.0001) 1000))
-;(pylab.plot (stream->list-upto (RC-circuit 100000.0 0.001 (gen-sine-wave 10.0 10.0 0.0001 0) 0.0001) 1000))
-;(pylab.plot (stream->list-upto (RC-circuit 100000.0 0.001 (gen-sine-wave 10.0 50.0 0.0001 0) 0.0001) 1000))
-;(pylab.plot (stream->list-upto (RC-circuit 100000.0 0.001 (gen-sine-wave 10.0 100.0 0.0001 0) 0.0001) 1000))
-;(pylab.plot (stream->list-upto (RC-circuit 100000.0 0.001 (gen-sine-wave 10.0 500.0 0.0001 0) 0.0001) 1000))
-;(pylab.plot (stream->list-upto (RC-circuit 100000.0 0.001 (gen-sine-wave 10.0 1000.0 0.0001 0) 0.0001) 1000))
-;(pylab.plot (stream->list-upto (RC-circuit 100000.0 0.001 (gen-sine-wave 10.0 10000.0 0.0001 0) 0.0001) 1000))
-(pylab.show)
+(pylab.xlabel "Frequency")
+(pylab.ylabel "Voltage")
+(pylab.savefig (str "rc_freq_response.png"))
 
 ; In the above, what's being delayed is the (stream-map f y)
 ; operation. Forcing it generates a stream that is the result of
