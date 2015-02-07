@@ -70,19 +70,23 @@
 
 
 (define token-stream (make-token-stream (string->stream "((123 def ghi) jkl)")))
-
 (display-stream-upto (stream-map (lambda (x) (car x)) token-stream) 10)
+
+
 
 (define (read-from-stream token-stream)
   (let* ((token-stream-pair (stream-car token-stream))
          (token (car token-stream-pair))
-         (rest-stream (cdr token-stream-pair)))
-    (cond ((token-leftpar? next-token) (read-list-from-stream '() (stream-cdr token-stream)))
-          (else token-stream-pair))))
+         (rest-char-stream (cdr token-stream-pair)))
+    (cond ((token-leftpar? token) (read-list-from-stream '() (stream-cdr token-stream)))
+          (else
+            token-stream-pair))))
 
 (define (read-list-from-stream list-so-far token-stream)
   (let* ((token-stream-pair (read-from-stream token-stream))
-         (token (car token-stream-pair))
-         (rest-stream (cdr token-stream-pair)))
-    (cond ((token-rightpar? token) (reverse list-so-far))
-          ((token-leftpar? token) (read-list-from-stream (cons
+         (token (car token-stream-pair)))
+    (cond ((token-rightpar? token) (cons (reverse list-so-far) (stream-cdr token-stream)))
+          ((token-leftpar? token)
+           (let* ((sublist (read-list-from-stream '() (stream-cdr token-stream)))
+                  (rest-token-stream (cdr ))
+             
