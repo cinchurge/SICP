@@ -32,11 +32,11 @@
 (define (read-token-from-stream chr-stream)
   (let ((first-char (stream-car chr-stream))
         (rest-stream (stream-cdr chr-stream)))
-    (cond ((char-whitespace? first-char) (read-token-from-stream rest-stream)) ; If we've encountered white space, keep reading
-          ((eq? first-char #\( ) (cons left-paren-token rest-stream)) ; If we've encountered a left paren, return the left paren token
-          ((eq? first-char #\) ) (cons right-paren-token rest-stream)) ; If we've encountered a right paren, return the right paren token
-          ((char-alphabetic? first-char) (read-identifier-from-stream first-char rest-stream)) ; Read an identifier if we've encountered an alphabetic letter
-          ((char-numeric? first-char) (read-number-from-stream first-char rest-stream)) ; Read a number if we've encountered a number
+    (cond ((char-whitespace? first-char) (read-token-from-stream rest-stream))
+          ((eq? first-char #\( ) (cons left-paren-token rest-stream))
+          ((eq? first-char #\) ) (cons right-paren-token rest-stream))
+          ((char-alphabetic? first-char) (read-identifier-from-stream first-char rest-stream))
+          ((char-numeric? first-char) (read-number-from-stream first-char rest-stream))
           (else
             (error "illegal lexical syntax")))))
 
@@ -51,7 +51,7 @@
           (if (or (char-alphabetic? next-char)
                   (char-numeric? next-char))
               (read-identifier-from-stream-helper (cons next-char list-so-far) rest-stream)
-              (cons (list-so-far->symbol list-so-far) chr-stream))))) ; We must return the full chr-stream and not just rest-stream
+              (cons (list-so-far->symbol list-so-far) chr-stream)))))
   (read-identifier-from-stream-helper (list chr) chr-stream))
 
 
@@ -64,29 +64,45 @@
               (rest-stream (stream-cdr chr-stream)))
           (if (char-numeric? next-char)
               (read-number-from-stream-helper (cons next-char list-so-far) rest-stream)
-              (cons (list-so-far->number list-so-far) chr-stream))))) ; We must return the full chr-stream and not just rest-stream
+              (cons (list-so-far->number list-so-far) chr-stream)))))
   (read-number-from-stream-helper (list chr) chr-stream))
 
 
 
 (define token-stream (make-token-stream (string->stream "((123 def ghi) jkl)")))
-(display-stream-upto (stream-map (lambda (x) (car x)) token-stream) 10)
 
+(define (token-leftpar? token)
+  (eq? token left-paren-token))
+(define (token-rightpar? token)
+  (eq? token right-paren-token))
 
 
 (define (read-from-stream token-stream)
   (let* ((token-stream-pair (stream-car token-stream))
          (token (car token-stream-pair))
-         (rest-char-stream (cdr token-stream-pair)))
-    (cond ((token-leftpar? token) (read-list-from-stream '() (stream-cdr token-stream)))
+         (rest-token-stream (stream-cdr token-stream)))
+    (cond ((token-leftpar? token)
+             (let* ((sublist-stream-pair (read-list-from-stream '() rest-token-stream))
+                    (sublist (car sublist-stream-pair)))
+                    sublist))
           (else
-            token-stream-pair))))
+            token))))
+
 
 (define (read-list-from-stream list-so-far token-stream)
-  (let* ((token-stream-pair (read-from-stream token-stream))
-         (token (car token-stream-pair)))
-    (cond ((token-rightpar? token) (cons (reverse list-so-far) (stream-cdr token-stream)))
+  (let* ((token-stream-pair (stream-car token-stream))
+         (token (car token-stream-pair))
+         (rest-token-stream (stream-cdr token-stream)))
+    (cond ((token-rightpar? token) (cons (reverse list-so-far) rest-token-stream))
           ((token-leftpar? token)
-           (let* ((sublist (read-list-from-stream '() (stream-cdr token-stream)))
-                  (rest-token-stream (cdr ))
-             
+             (let* ((sublist-stream-pair (read-list-from-stream '() rest-token-stream))
+                    (sublist (car sublist-stream-pair))
+                    (sublist-rest-token-stream (cdr sublist-stream-pair)))
+                    (read-list-from-stream (cons sublist list-so-far) sublist-rest-token-stream)))
+          (else
+            (read-list-from-stream (cons token list-so-far) rest-token-stream)))))
+
+(define (read-string str)
+  (read-from-stream (make-token-stream (string->stream str))))
+
+(display (read-string "(abc def ghi)"))
