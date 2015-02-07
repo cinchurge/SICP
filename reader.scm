@@ -1,0 +1,41 @@
+(define (micro-read-token)
+  (let ((first-char (read-char)))
+    (cond ((char-whitespace? first-char) (micro-read-token))
+          ((eq? first-char #\( ) left-paren-token)
+          ((eq? first-char #\) ) right-paren-token)
+          ((char-alphabetic? first-char) (micro-read-identifier first-char))
+          ((char-numeric? first-char) (micro-read-number first-char))
+          (else
+            (error "illegal lexical syntax")))))
+
+(define left-paren-token (list '*left-parenthesis-token*))
+(define right-paren-token (list '*right-parenthesis-token*))
+
+(define (micro-read-identifier chr)
+  (define (mri-helper list-so-far)
+    (let ((next-char (peek-char)))
+      (if (or (char-alphabetic? next-char)
+              (char-numeric? next-char))
+          (mri-helper (cons (read-char) list-so-far))
+          (reverse list-so-far))))
+  (string->symbol (list->string (mri-helper (list chr)))))
+
+(define (micro-read-number chr)
+  (define (mrn-helper list-so-far)
+    (let ((next-char (peek-char)))
+      (if (char-numeric? next-char) 
+          (read-number-helper (cons (read-char) list-so-far))
+          (reverse list-so-far))))
+  (string->number (list->string (read-number-helper (list chr)))))
+
+(define (micro-read)
+  (let ((next-token (micro-read-token)))
+    (cond ((token-leftpar? next-token)
+           (read-list '()))
+          (else next-token))))
+
+(define (read-list list-so-far)
+  (let ((token (micro-read-token)))
+    (cond ((token-rightpar? token) (reverse list-so-far))
+          ((token-leftpar? token) (read-list (cons (read-list '()) list-so-far))))))
+  

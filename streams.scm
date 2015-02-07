@@ -87,13 +87,13 @@
 
 ; display-stream-upto
 (define (display-stream-upto s n)
-  (define (loop c n)
-    (if (>= c n)
+  (define (display-stream-upto-helper s c n)
+    (if (or (>= c n) (stream-null? s))
       (display "")
       (begin
-        (printf "~S => ~S~N" (+ c 1) (stream-ref s c))
-        (loop (+ c 1) n))))
-  (loop 0 n))
+        (printf "~S => ~S~N" (+ c 1) (stream-car s))
+        (display-stream-upto-helper (stream-cdr s) (+ c 1) n))))
+  (display-stream-upto-helper s 0 n))
 
 ; stream->list-upto
 (define (stream->list-upto s n)
@@ -111,3 +111,9 @@
 (define (partial-sums s)
   (cons-stream (stream-car s) (add-streams (partial-sums s) (stream-cdr s))))
 
+; list->stream
+(define (list->stream lst)
+  (if (null? lst)
+      the-empty-stream
+      (cons-stream (car lst) (list->stream (cdr lst)))))
+    
