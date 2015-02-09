@@ -48,18 +48,4 @@
 ; This should return (4 3 2 1)
 (test "Evaluating '(1 2 3 4) with forced right-to-left version:" '(4 3 2 1) (list-of-values '(4 3 2 1) 'env))
 
-; Exercise 4.2:
-(printf "Exercise 4.2: see comments~N")
-(newline)
-; a: Louis's plan is flawed because the application? test will match
-;    any pair, thus treating EVERYTHING as an application. Assignment
-;    in this case will be executed at all. (define x 3) will result
-;    in an attempt to apply the 'define' procedure with arguments x and 3.
-; b: Simply redefine the application? test as:
-(define (application? exp)
-  (tagged-list? exp 'call))
-
-; Exercise 4.3:
-
-; Exercise 4.4:
 
