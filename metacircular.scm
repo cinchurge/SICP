@@ -291,3 +291,62 @@
               result
               (eval-or-helper rest-expr env)))))
   (eval-or-helper (cdr expr) env))
+
+; Primitive procedures
+(define (primitive-procedure? proc)
+  (tagged-list? proc 'primitive))
+(define (primitive-implementation proc) (cadr proc))
+
+(define primitive-procedures
+  (list (list 'car car)
+        (list 'cdr cdr)
+        (list 'cons cons)
+        (list '+ +)
+        (list '- -)
+        (list '* *)
+        (list '/ /)
+        (list 'append append)
+        (list 'null? null?)))
+(define (primitive-procedure-names)
+  (map car primitive-procedures))
+(define (primitive-procedure-objects)
+  (map (lambda (proc) (list 'primitive (cadr proc)))
+       primitive-procedures))
+(define (apply-primitive-procedure proc args)
+  (apply-in-underlying-scheme
+    (primitive-implementation proc) args))
+(define (apply-in-underlying-scheme proc args)
+  (apply proc args))
+
+; Environment setup
+(define (setup-environment)
+  (let ((initial-env
+        (extend-environment (primitive-procedure-names)
+                            (primitive-procedure-objects)
+                            the-empty-environment)))
+        (define-variable! 'true #t initial-env)
+        (define-variable! 'false #f initial-env)
+        initial-env))
+(define the-global-environment (setup-environment))
+
+; Driver loop
+(define input-prompt ";;; M-Eval input:")
+(define output-prompt ";;; M-Eval value:")
+(define (driver-loop)
+  (prompt-for-input input-prompt)
+  (let ((input (read)))
+    (let ((output (micro-eval input the-global-environment)))
+      (announce-output output-prompt)
+      (user-print output)))
+  (driver-loop))
+(define (prompt-for-input str)
+  (newline)(newline)(display str)(newline))
+(define (announce-output str)
+  (newline)(display str)(newline))
+(define (user-print object)
+  (if (compound-procedure? object)
+    (display (list 'compound-procedure
+                   (procedure-parameters object)
+                   (procedure-body object)
+                   '<procedure-env>))
+    (display object)))

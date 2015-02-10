@@ -1,7 +1,7 @@
 ; Unit tests for the metacircular evaluator
 
-(use test)
 (load "metacircular.scm")
+(use test)
 
 (define (test-eval-apply eval-fn)
   (let ((env the-empty-environment))
@@ -14,7 +14,7 @@
              (test-frame (first-frame test-env)))
         (add-binding-to-frame! 'c 3 test-frame)
         (add-binding-to-frame! 'f (make-procedure '(input) '(if input 1 2) test-env) (first-frame (extend-environment '() '() the-empty-environment)))
-        (test "add-binding-to-frame!" '() (begin test-frame)))
+        (test "add-binding-to-frame!" '((c a b) 3 1 2) (begin test-frame)))
       (let* ((test-env (extend-environment '() '() the-empty-environment))
              (dummy (define-variable! 'foo 42 test-env))
              (result-foo (lookup-variable-value 'foo test-env))
@@ -50,7 +50,10 @@
                                                test-env))
         (test "lambda" '(procedure (input) ((if input 1 2)) ((()))) (eval-fn '(lambda (input) (if input 1 2)) test-env))
         (test "definition-variable" 'test-func (definition-variable test-func-quoted))
-        (test "definition-value" '(lambda (input) (if input 1 2)) (definition-value test-func-quoted)))
+        (test "definition-value" '(lambda (input) (if input 1 2)) (definition-value test-func-quoted))
+        (eval-fn test-func-quoted test-env)
+        (test "Apply defined function (1)" 1 (eval-fn '(test-func true) test-env))
+        (test "Apply defined function (2)" 2 (eval-fn '(test-func false) test-env)))
       (test "and: t" #t (eval-fn '(and true) env))
       (test "and: f" #f (eval-fn '(and false) env))
       (test "and: t t" #t (eval-fn '(and true true) env))
@@ -68,4 +71,5 @@
 
 
 (test-eval-apply micro-eval)
-
+(define the-global-environment (setup-environment))
+(driver-loop)
