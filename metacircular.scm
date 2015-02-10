@@ -1,9 +1,13 @@
+(use extras)
+
 ; micro-eval
 (define (micro-eval expr env)
   (cond ((self-evaluating? expr) expr)
         ((true? expr) #t)
         ((false? expr) #f)
         ((variable? expr) (lookup-variable-value expr env))
+        ((and? expr) (eval-and expr env))
+        ((or? expr) (eval-or expr env))
         ((quoted? expr) (text-of-quotation expr))
         ((assignment? expr) (eval-assignment expr env))
         ((definition? expr) (eval-definition expr env))
@@ -202,23 +206,8 @@
 (define (frame-variables frame) (car frame))
 (define (frame-values frame) (cdr frame))
 (define (add-binding-to-frame! var val frame)
-;  (display "before: add-binding-to-frame!:var=")
-;  (display var)
-;  (display ",val=")
-;  (display val)
-;  (display ",frame=")
-;  (display frame)
-;  (newline)
   (set-car! frame (cons var (car frame)))
-  (set-cdr! frame (cons val (cdr frame)))
-;  (display "after: add-binding-to-frame!:var=")
-;  (display var)
-;  (display ",val=")
-;  (display val)
-;  (display ",frame=")
-;  (display frame)
-;  (newline)
-)
+  (set-cdr! frame (cons val (cdr frame))))
 
 ; Extend the environment by creating a new frame consisting
 ; of the list of variables and the list of values, and we
@@ -268,10 +257,6 @@
   (env-loop env))
 
 (define (define-variable! var val env)
-  (display "define-variable!:var=")
-  (display var)(display ",val=")
-  (display val)(display ",env=")
-  (display env)(newline)
   (let ((frame (first-frame env)))
     (define (scan vars vals)
       (cond ((null? vars)
@@ -281,3 +266,28 @@
             (else (scan (cdr vars) (cdr vals)))))
     (scan (frame-variables frame)
           (frame-values frame))))
+
+; and & or
+(define (and? expr) (tagged-list? expr 'and))
+(define (eval-and expr env)
+  (define (eval-and-helper expr env)
+    (let ((result (micro-eval (car expr) env))
+          (rest-expr (cdr expr)))
+      (if result
+          (if (null? rest-expr)
+              result
+              (eval-and-helper rest-expr env))
+          result)))
+  (eval-and-helper (cdr expr) env))
+
+(define (or? expr) (tagged-list? expr 'or))
+(define (eval-or expr env)
+  (define (eval-or-helper expr env)
+    (let ((result (micro-eval (car expr) env))
+          (rest-expr (cdr expr)))
+      (if result
+          result
+          (if (null? rest-expr)
+              result
+              (eval-or-helper rest-expr env)))))
+  (eval-or-helper (cdr expr) env))
