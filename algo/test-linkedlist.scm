@@ -1,9 +1,9 @@
 (load "linkedlist.scm")
 (use test)
 
-(test "linked-list-insert 1 '()" '(1) (linked-list-insert 1 '()))
-(test "linked-list-insert 2 '(1)" '(2 1) (linked-list-insert 2 '(1)))
-(test "linked-list-insert 1 '(1 2)" '(1 1 2) (linked-list-insert 1 '(1 2)))
+(test "linked-list-prepend 1 '()" '(1) (linked-list-prepend 1 '()))
+(test "linked-list-prepend 2 '(1)" '(2 1) (linked-list-prepend 2 '(1)))
+(test "linked-list-prepend 1 '(1 2)" '(1 1 2) (linked-list-prepend 1 '(1 2)))
 
 (test "linked-list-append 1 '()" '(1) (linked-list-append 1 '()))
 (test "linked-list-append 2 '(1)" '(1 2) (linked-list-append 2 '(1)))

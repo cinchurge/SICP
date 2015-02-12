@@ -1,5 +1,5 @@
-(define (linked-list-insert x linked-list)
-  ; Insert x into the beginning of the linked-list
+(define (linked-list-prepend x linked-list)
+  ; Prepend x to the beginning of linked-list
   (cons x linked-list))
 
 (define (linked-list-append x linked-list)
