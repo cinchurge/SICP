@@ -71,5 +71,5 @@
 
 
 (test-eval-apply micro-eval)
-(define the-global-environment (setup-environment))
-(driver-loop)
+;(define the-global-environment (setup-environment))
+;(driver-loop)
