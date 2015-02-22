@@ -56,6 +56,10 @@
         (else
           (error "Unknown expression type: EVAL" expr))))
 
+(let ((env (setup-environment))
+      (expr '(cond ((cons 1 2) => car))))
+  (test '(b 2) (micro-eval '(assoc  'b '((a 1) (b 2))) env)))
+
 (define (cond->if expr env) (expand-clauses (cond-clauses expr) env))
 
 (define (expand-clauses clauses env)
@@ -94,6 +98,8 @@
 
 (let ((env (setup-environment))
       (expr '(cond ((cons 1 2) => car))))
+  (display (micro-eval '(assoc  'b '((a 1) (b 2))) env))(newline)
+  (test "(assoc  'b '((a 1) (b 2)))" '(b 2) (micro-eval '(assoc  'b '((a 1) (b 2)))))
   (test "cond-testapply-clause?" #t (cond-testapply-clause? expr))
   (micro-eval '(cond ('(1 2) => car)) env)
   (test "cond: test => recipient" (expand-clauses '(((cons 1 2) => car)) env)))

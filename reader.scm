@@ -70,6 +70,24 @@
 (define (token-leftpar? token) (eq? token left-paren-token))
 (define (token-rightpar? token) (eq? token right-paren-token))
 
+
+;;; Simplified version of read for subset of Scheme s-expression syntax
+;(define (micro-read)
+;   (let ((next-token (read-token))
+;      (cond ((token-leftpar? next-token)
+;             (read-list '()))
+;            (else
+;             next-token))))
+;
+;(define (read-list list-so-far)
+;   (let ((token (micro-read-token)))        
+;      (cond ((token-rightpar? token)
+;             (reverse list-so-far))
+;            ((token-leftpar? token)
+;             (read-list (cons (read-list '()) list-so-far)))
+;            (else
+;             (read-list (cons token list-so-far))))))
+
 ; Read from a token stream and convert the result into symbols. This procedure
 ; operates together with read-list-from-stream to create nested lists.
 (define (read-from-stream token-stream)
@@ -97,6 +115,9 @@
                     (read-list-from-stream (cons sublist list-so-far) sublist-rest-token-stream)))
           (else
             (read-list-from-stream (cons token list-so-far) rest-token-stream)))))
+
+
+
 
 ; Convert a nested s-expression into nested lists
 (define (read-string str)
