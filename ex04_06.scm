@@ -34,6 +34,7 @@
   (tagged-list? expr 'let))
 
 (define (let->combination expr)
+  ; Create a lambda from the parameters and apply it to the evaluated expressions
   (cons (make-lambda (collect-lambda-parms (let-vars expr))
                      (let-body expr))
         (collect-lambda-exprs (let-vars expr))))
