@@ -330,8 +330,6 @@
         (extend-environment (primitive-procedure-names)
                             (primitive-procedure-objects)
                             the-empty-environment)))
-        (define-variable! 'true #t initial-env)
-        (define-variable! 'false #f initial-env)
         initial-env))
 (define the-global-environment (setup-environment))
 
