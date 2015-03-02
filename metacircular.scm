@@ -306,6 +306,7 @@
         (list 'cadr cadr)
         (list 'cons cons)
         (list 'display display)
+        (list '= =)
         (list '+ +)
         (list '- -)
         (list '* *)
