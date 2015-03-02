@@ -3,8 +3,6 @@
 ; micro-eval
 (define (micro-eval expr env)
   (cond ((self-evaluating? expr) expr)
-        ((true? expr) #t)
-        ((false? expr) #f)
         ((variable? expr) (lookup-variable-value expr env))
         ((and? expr) (eval-and expr env))
         ((or? expr) (eval-or expr env))
@@ -55,7 +53,7 @@
 
 ; Conditionals
 (define (eval-if expr env)
-  (if (micro-eval (if-predicate expr) env)
+  (if (true? (micro-eval (if-predicate expr) env))
       (micro-eval (if-consequent expr) env)
       (micro-eval (if-alternative expr) env)))
 
@@ -86,7 +84,12 @@
 (define (self-evaluating? expr)
   (cond ((number? expr) #t)
         ((string? expr) #t)
+        ((truefalse? expr) #t)
         (else #f)))
+
+(define (truefalse? expr)
+  (or (eq? expr 'true)
+      (eq? expr 'false)))
 
 ; variables
 (define (variable? expr) (symbol? expr))
@@ -179,7 +182,7 @@
 
 ; Testing of predicates
 (define (true? x)
-  (eq? x 'true))
+  (not (eq? x 'false)))
 
 (define (false? x)
   (eq? x 'false))
@@ -273,7 +276,7 @@
   (define (eval-and-helper expr env)
     (let ((result (micro-eval (car expr) env))
           (rest-expr (cdr expr)))
-      (if result
+      (if (true? result)
           (if (null? rest-expr)
               result
               (eval-and-helper rest-expr env))
@@ -285,7 +288,7 @@
   (define (eval-or-helper expr env)
     (let ((result (micro-eval (car expr) env))
           (rest-expr (cdr expr)))
-      (if result
+      (if (true? result)
           result
           (if (null? rest-expr)
               result
