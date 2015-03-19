@@ -1,3 +1,5 @@
+(use test)
+
 (define (add-interval x y)
   (make-interval (+ (lower-bound x) (lower-bound y))
                  (+ (upper-bound x) (upper-bound y))))
@@ -13,14 +15,31 @@
 (define (div-interval x y)
   (mul-interval
    x
-   (make-interval (/ 1.0 (upper-bound x))
+   (make-interval (/ 1.0 (upper-bound y))
                   (/ 1.0 (lower-bound y)))))
 
 ; Exercise 2.7:
 ; Implement the constructor and selectors
-(define (make-interval a b) (cons a b))
-(define (upper-bound x) (cdr x))
+(define (make-interval l u) (cons l u))
 (define (lower-bound x) (car x))
+(define (upper-bound x) (cdr x))
+
+; Unit tests
+(let ((x (make-interval -0.5 0.5))
+      (y (make-interval -1 1)))
+  (test 0.5 (upper-bound x))
+  (test -0.5 (lower-bound x))
+  (let ((a (add-interval x y))
+        (m (mul-interval x y))
+        (d (div-interval x y)))
+    (test 1.5 (upper-bound a))
+    (test -1.5 (lower-bound a))
+    (test -0.5 (lower-bound m))
+    (test 0.5 (upper-bound m))
+    (test -0.5 (lower-bound d))
+    (test 0.5 (upper-bound d))
+  )
+)
 
 ; Exercise 2.8:
 ; Describe how the difference of two intervals
@@ -45,3 +64,24 @@
        (make-interval (/ 1.0 (upper-bound x))
                       (/ 1.0 (lower-bound y))))))
 
+; Exercise 2.11:
+; Modify mul-interval to take into account the sign of the
+; interval endpoints
+
+(define (mul-interval x y)
+  (let ((a (upper-bound x))
+        (b (lower-bound x))
+        (c (upper-bound y))
+        (d (lower-bound y)))
+    (cond ((and (> a 0) (> b 0))
+           (cond ((and (> c 0) (> d 0)) (make-interval (* a c) (* b d)))
+                 ((and (> c 0) (< d 0)) (make-interval (* a c) (* a d)))
+                 ((and (< c 0) (< d 0)) (make-interval (* b c) (* b d)))))
+          ((and (> a 0) (< b 0))
+           (cond ((and (> c 0) (> d 0)) (make-interval (* a c) (* b c)))
+                 ((and (> c 0) (< d 0)) (make-interval (max (* a c) (* b d)) (min (* a d) (* b c))))
+                 ((and (< c 0) (< d 0)) (make-interval (* b c) (* a d)))))
+          ((and (> a 0) (< b 0))
+           (cond ((and (> c 0) (> d 0)) (make-interval (* a d) (* b c)))
+                 ((and (> c 0) (< d 0)) (make-interval (* b d) (* b c)))
+                 ((and (< c 0) (< d 0)) (make-interval (* b d) (* a c))))))))

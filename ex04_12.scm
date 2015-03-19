@@ -72,7 +72,7 @@
 (load "test-metacircular.scm")
 (printf "~N")
 
-(printf "Exercise 4.11 unit tests~N")
+(printf "Exercise 4.12 unit tests~N")
 ; Test variable binding and lookup
 (let ((env (setup-environment)))
   (test '(() (a . 1) (b . 2) (c . 3)) (make-frame '(a b c) '(1 2 3)))
