@@ -44,9 +44,26 @@
 
 ; Exercise 2.7:
 ; Implement the constructor and selectors
-(define (make-interval a b) (cons a b))
-(define (upper-bound x) (cdr x))
+(define (make-interval l u) (cons l u))
 (define (lower-bound x) (car x))
+(define (upper-bound x) (cdr x))
+
+; Unit tests
+(let ((x (make-interval -0.5 0.5))
+      (y (make-interval -1 1)))
+  (test 0.5 (upper-bound x))
+  (test -0.5 (lower-bound x))
+  (let ((a (add-interval x y))
+        (m (mul-interval x y))
+        (d (div-interval x y)))
+    (test 1.5 (upper-bound a))
+    (test -1.5 (lower-bound a))
+    (test -0.5 (lower-bound m))
+    (test 0.5 (upper-bound m))
+    (test -0.5 (lower-bound d))
+    (test 0.5 (upper-bound d))
+  )
+)
 
 ; Exercise 2.8:
 ; Describe how the difference of two intervals
